@@ -31,7 +31,7 @@ DEBUG = True
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-ALLOWED_HOSTS = ['127.0.0.1',]
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
@@ -44,10 +44,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "rest_framework",
     'cloudinary',
-    'handle'
+    'handle',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
+     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -129,14 +131,14 @@ ROOT_URLCONF = 'EnglishAppBE.urls'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-CORS_ORIGIN_WHITELIST = [
 
-    "http://localhost:3000",
-
-]
 cloudinary.config(
     cloud_name = '', 
     api_key = '', 
     api_secret =''
 )
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:8081',
+  
+]
  

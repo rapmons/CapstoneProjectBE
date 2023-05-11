@@ -18,15 +18,15 @@ class RegisterView(APIView):
 class LoginView(APIView):
     def post(self, request):
         username = request.data['username']
-        phone = request.data['phone']
+        phone = request.data['password']
 
         user = users.objects.filter(username=username).first()
 
         if user is None:
             raise AuthenticationFailed('User not found!')
 
-        if not user.phone == phone:
-            raise AuthenticationFailed('Incorrect phone!')
+        if not user.password == phone:
+            raise AuthenticationFailed('Incorrect password!')
 
         payload = {
             'username': user.username,
