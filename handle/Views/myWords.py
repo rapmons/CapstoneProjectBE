@@ -5,6 +5,8 @@ from rest_framework.exceptions import AuthenticationFailed
 from ..Serializer.users import usersSerializer
 from ..models import users,myWords,words
 from ..Serializer.myWords import myWordsSerializer
+from django.db.models.functions import Random
+from django.http import JsonResponse
 
 import jwt
 class my_dictionary(dict):
@@ -25,23 +27,28 @@ class GameView(APIView):
             raise AuthenticationFailed('Unauthenticated!')
 
         user = users.objects.filter(username=payload['username']).first()
-        list_word= list(words.objects.all())
-        myWord= list(myWords.objects.filter(users_id=user.id).order_by('-id')[:10])
-        result_list = ["A", "B", "C", "D"]
-        questtion=list()
-        for i in myWord:
-            mapArray= my_dictionary()
-            textRandom= list( random.sample(list_word,3))
-            result= list( random.sample(result_list,4))
-            mapArray.add(result[0],i.word.text)
-            mapArray.add(result[1],textRandom[0])
-            mapArray.add(result[2],textRandom[1])
-            mapArray.add(result[3],textRandom[2])
-            mapArray.add("true", result[0])
-            mapArray.add("question",i.url)
-            questtion.append(mapArray)
+        list_word=list(words.objects.all())
+        quiz_questions = myWords.objects.filter(users=user,saveF=True).order_by(Random())[:10]
             
-        return Response(questtion)
+        questions = []
+        for quiz_question in quiz_questions:
+            qu=[]
+            textRandom= list( random.sample(list_word,3))
+            qu.append(textRandom[0].text)
+            qu.append(textRandom[1].text)
+            qu.append(textRandom[2].text)
+            qu.append(quiz_question.word.text)
+            hehe=list(random.sample(qu,4))
+            
+            
+            question = {
+                'question': quiz_question.url,
+                'text':quiz_question.word.mean,
+                'answers': hehe,
+                'correctAnswerIndex':hehe.index(quiz_question.word.text),
+            }
+            questions.append(question)
+        return JsonResponse(questions, safe=False)
 
 class historyWordsView(APIView):
     def get(self, request):
@@ -57,8 +64,20 @@ class historyWordsView(APIView):
         user = users.objects.filter(username=payload['username']).first()
        
         myWord= myWords.objects.filter(users_id=user.id).order_by('-id')
-        serializer = myWordsSerializer(myWord, many=True)
-        return Response(serializer.data)
+        resul=[]
+        for i in myWord:
+            qu={
+                "id":i.id,
+                "text":i.word.text,
+                "mean":i.word.mean,
+                "spell":i.word.spell,
+                "type":i.word.wordType,
+                "url":i.url,
+                "saved":i.saveF
+            }
+            resul.append(qu)
+        return JsonResponse(resul, safe=False)   
+
 class saveWordsView(APIView):
     def post(self, request):
         token = request.COOKIES.get('jwt')
@@ -71,17 +90,26 @@ class saveWordsView(APIView):
             raise AuthenticationFailed('Unauthenticated!')
 
         user = users.objects.filter(username=payload['username']).first()
-        word1= words.objects.filter(id=request.data['id_word']).first()
-        myWords.objects.create(
-             word=word1,
-             users=user,
-             saveF=True,
-             url=request.data['url']
-        )
-        return Response("Save successfuly !")
+        word1= words.objects.filter(id=request.data['idWord']).first()
+        savedWord= myWords.objects.filter(word=word1,users=user).first()
+        if savedWord !=None:
+           myWords.objects.filter(word=word1,users=user).update(
+                saveF=request.data['saved'], 
+            )
+        else:
+             myWords.objects.create(
+                word=word1,
+                users=user,
+                saveF=request.data['saved'],
+                url=request.data['url']
+            )
+        if request.data['saved']:
+            return Response("Save successfuly !")
+
+        return Response("Delete successfuly !")
 
 class WordSavedView(APIView):
-    def post(self, request):
+    def get(self, request):
         token = request.COOKIES.get('jwt')
         if not token:
             raise AuthenticationFailed('Unauthenticated!')
@@ -91,8 +119,19 @@ class WordSavedView(APIView):
             raise AuthenticationFailed('Unauthenticated!')
 
         user = users.objects.filter(username=payload['username']).first()
-        myWord= myWords.objects.filter(users_id= user.id, saveF= 0).order_by('-id')
-        serializer = myWordsSerializer(myWord, many=True)
-        return Response(serializer.data)
+        myWord= myWords.objects.filter(users=user,saveF=True).order_by('id')
+        resul=[]
+        for i in myWord:
+            qu={
+                "id":i.id,
+                "text":i.word.text,
+                "mean":i.word.mean,
+                "spell":i.word.spell,
+                "type":i.word.wordType,
+                "url":i.url,
+                "saved":i.saveF
+            }
+            resul.append(qu)
+        return JsonResponse(resul, safe=False)   
 	
 

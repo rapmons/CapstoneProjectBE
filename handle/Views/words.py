@@ -11,17 +11,17 @@ class Command(APIView):
         file = request.FILES.get('file')
         vocabulary_list = json.load(file)
         hehe= topic.objects.create(
-            id=1,
-            name='detect'
+            id=5,
+            name='Conferences'
         )
         for vocabulary in vocabulary_list:
             words.objects.create(
                 text=vocabulary['text'],
                 mean=vocabulary['mean'],
                 spell=vocabulary['spell'],
-                wordType=vocabulary['word_type'],
+                wordType=vocabulary['word type'],
                 topic=hehe,
-                url=vocabulary['url_topic']
+                url=vocabulary['url']
             )
 
         return Response({'message': 'Vocabulary imported successfully.'})

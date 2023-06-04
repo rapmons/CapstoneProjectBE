@@ -41,8 +41,12 @@ class historyResult(models.Model):
     users= models.ForeignKey(users,on_delete=models.CASCADE)
     numberQT= models.IntegerField(default=0)
     numberQF= models.IntegerField(default=0)
-    timeStart= models.DateTimeField(default=datetime.now())
-    
+    topic= models.ForeignKey(topic,on_delete=models.CASCADE, null=True)
+class historySearch(models.Model):
+    id= models.AutoField(auto_created=True, primary_key=True)
+    users= models.ForeignKey(users,on_delete=models.CASCADE)
+    idSearch=models.IntegerField(default=0)
+    delete= models.BooleanField(default=0)   
 
 
 

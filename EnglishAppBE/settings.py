@@ -132,11 +132,6 @@ ROOT_URLCONF = 'EnglishAppBE.urls'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-cloudinary.config(
-    cloud_name = '', 
-    api_key = '', 
-    api_secret =''
-)
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:8081',
   
