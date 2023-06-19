@@ -5,7 +5,7 @@ from .Views.words import Command
 from .Views.myWords import saveWordsView, GameView,WordSavedView
 from .Views.topic import getResultWord, Game,getListWord
 from .Views.historySearch import createView, historyView
-
+from .Views.topic import saveResul
 urlpatterns = [
     path('register', RegisterView.as_view()),
     path('login', LoginView.as_view()),
@@ -20,6 +20,6 @@ urlpatterns = [
     path("game-toeic",Game.as_view()),
     path("get-list-word",getListWord.as_view()),
     path("create-search",createView.as_view()),
-    path("get-list-history-search",historyView.as_view())
-
+    path("get-list-history-search",historyView.as_view()),
+    path("save-result", saveResul.as_view())
 ]

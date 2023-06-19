@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from ..Serializer.words import wordsSerializer
 from ..models import words,myWords,users
-from .Caption import caption_this_image
+from .Caption1 import caption_this_image
 from PIL import Image
 import keras
 from io import BytesIO

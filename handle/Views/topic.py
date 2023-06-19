@@ -105,5 +105,33 @@ class getResultWord(APIView):
 
         return JsonResponse(result, safe=False)
 
-	
+class saveResul(APIView):
+    def post(self, request):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+            raise AuthenticationFailed('Unauthenticated!')
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Unauthenticated!')
+
+        user = users.objects.filter(username=payload['username']).first()
+        topic1=topic.objects.filter(id=request.data["idTopic"]).first()
+        he= historyResult.objects.filter(users=user,topic=topic1).first()
+        if he==None:
+            historyResult.objects.create(
+                users=user,
+                numberQT=request.data["number"],
+                topic=topic1
+
+            )
+        else:
+            historyResult.objects.filter(users=user,topic=topic1).update(
+                numberQT=request.data["number"]
+            )
+
+
+        
+        return Response("Successfuly!")	
 
